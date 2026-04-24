@@ -1,0 +1,6 @@
+{
+  "extraPaths": [
+    "./base",
+    "/nix/store/dvdyz432fg614ispvfpix11cmkxzs555-python3-3.13.12-env/lib/python3.13/site-packages"
+  ]
+}
