@@ -18,7 +18,7 @@
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          python = pkgs.python3.withPackages (ps: [ ps.tkinter ]);
+          python = pkgs.python3.withPackages (ps: [ ps.commentjson ]);
         in
         {
           default = pkgs.writeShellApplication {
@@ -47,23 +47,5 @@
           };
         }
       );
-
-      # ── NixOS module ─────────────────────────────────────────────────────
-      nixosModules.default =
-        {
-          config,
-          pkgs,
-          lib,
-          ...
-        }:
-        {
-          environment.systemPackages = [
-            (pkgs.writeShellApplication {
-              name = "browser-selector";
-              runtimeInputs = [ (pkgs.python3.withPackages (ps: with ps; [ commentjson ])) ];
-              text = ''exec python3 "${./sorter.py}" "$@"'';
-            })
-          ];
-        };
     };
 }
