@@ -109,7 +109,7 @@ def _safe_move(src: Path, dst_dir: Path, delete_if_same: bool) -> None:
   if plain.exists() and delete_if_same and plain.is_file() and src.is_file():
     if _files_identical(src, plain):
       src.unlink()
-      print.info(f"Deleted duplicate: {src.name}")
+      print.warn(f"Deleted duplicate: {src.name}")
       return
 
   shutil.move(str(src), str(dst))
@@ -122,7 +122,7 @@ def _move_to_trash(path: Path) -> None:
     import send2trash
 
     send2trash.send2trash(str(path))
-    print.info(f"Trashed: {path.name}")
+    print.warn(f"Trashed: {path.name}")
     return
   except ImportError:
     pass
@@ -131,7 +131,7 @@ def _move_to_trash(path: Path) -> None:
   trash.mkdir(parents=True, exist_ok=True)
   dst = _unique_dest(trash / path.name)
   shutil.move(str(path), str(dst))
-  print.info(f"Trashed (XDG fallback): {path.name}")
+  print.warn(f"Trashed (XDG fallback): {path.name}")
 
 
 def _get_extensions(path: Path) -> list[str]:
@@ -356,7 +356,7 @@ def sort_folder(base_path: Path, settings: dict) -> None:
     return
 
   if clear_empty:
-    print.info("Clearing empty folders…")
+    print.debug("Clearing empty folders…")
     _remove_empty_dirs(base_path, ignores)
 
   # Build set of all destination dirs so we never move them
@@ -470,7 +470,7 @@ def sort_folder(base_path: Path, settings: dict) -> None:
   # ── Deferred items (min/max time) ─────────────────────────────────────────
   if deferred and min_time is not None:
     wait = _secs_until_moveable(deferred, min_time) + 0.5
-    print.info(f"{len(deferred)} item(s) deferred — retrying in {wait:.1f}s…")
+    print.debug(f"{len(deferred)} item(s) deferred — retrying in {wait:.1f}s…")
     time.sleep(wait)
     sort_folder(base_path, settings) # recurse once items are old enough
 
@@ -496,7 +496,7 @@ for entry in paths_to_watch:
   # Expand ~ and env vars; make absolute
   base_path = Path(os.path.expandvars(os.path.expanduser(raw_path))).resolve()
 
-  print.info(f"\nSorting: {base_path}")
+  print.debug(f"\nSorting: {base_path}")
   sort_folder(base_path, settings)
 
 print.success("\nAll done!")

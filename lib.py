@@ -161,15 +161,15 @@ class print:
     if not cls.showdebugs:
       return
 
-    prevprint(
-      f"{getcolor("BLUE")}{getcolor("BOLD")}[DEBUG]{getcolor("END")}",
-      *map(bind(formatitem, nocolor=False), a),
-      getcolor("END"),
-      sep=sep,
-      end=end,
-      file=file,
-      flush=flush,
-    )
+    # prevprint(
+    #   f"{getcolor("BLUE")}{getcolor("BOLD")}[DEBUG]{getcolor("END")}",
+    #   *map(bind(formatitem, nocolor=False), a),
+    #   getcolor("END"),
+    #   sep=sep,
+    #   end=end,
+    #   file=file,
+    #   flush=flush,
+    # )
 
   @staticmethod
   def warn(
