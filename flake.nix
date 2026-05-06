@@ -26,7 +26,6 @@
               ./lib.py
             ];
           };
-
         in
         {
           default = pkgs.writeShellApplication {
