@@ -19,13 +19,21 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           python = pkgs.python3.withPackages (ps: [ ps.commentjson ]);
+          src = pkgs.lib.fileset.toSource {
+            root = ./.;
+            fileset = pkgs.lib.fileset.unions [
+              ./sorter.py
+              ./lib.py
+            ];
+          };
+
         in
         {
           default = pkgs.writeShellApplication {
             name = "file-sorter";
             runtimeInputs = [ python ];
             text = ''
-              exec python3 "${./sorter.py}" "$@"
+              exec python3 "${src}/sorter.py" "$@"
             '';
           };
         }
