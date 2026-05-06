@@ -10,10 +10,8 @@ Dependencies (pip install):
   send2trash    - optional, for nicer TRASH support
 """
 
-import json
 import os
 import re
-from socket import SO_J1939_ERRQUEUE
 import sys
 import time
 import shutil
@@ -337,7 +335,10 @@ def _remove_empty_dirs(base: Path, ignores: list) -> None:
 
 def sort_folder(base_path: Path, settings: dict) -> None:
   """Sort everything directly inside *base_path* using *settings*."""
-  sort_map: dict = settings.get("sort folders", {})
+  sort_map: dict = {
+    key: Path(val).expanduser()
+    for key, val in settings.get("sort folders", {}).items()
+  }
   ignores: list = settings.get("ignores", [])
   ignore_folders: list = settings.get("ignorefolders", [])
   move_ext_as_files: bool = settings.get(
@@ -422,6 +423,13 @@ def sort_folder(base_path: Path, settings: dict) -> None:
           dest = base_path / unmoved
 
       if dest is not None:
+        # Guard: destination must not be inside the source directory itself
+        try:
+          dest.resolve().relative_to(item.resolve())
+          print.info(f"Skipping '{item.name}': destination '{dest}' is inside source — would move folder into itself")
+          continue
+        except ValueError:
+          pass
         if not _check_time(item, min_time, max_time):
           deferred.append(item)
           continue
@@ -492,4 +500,3 @@ for entry in paths_to_watch:
   sort_folder(base_path, settings)
 
 print.success("\nAll done!")
-

@@ -1,7 +1,7 @@
 {
   "paths to watch": [
     {
-      "path": "C:/Users/user/default path to sort", // path to sort files in
+      "path": "~/default path to sort", // path to sort files in
       "settings": {
         // settings for sorting the path
         "#include": ["default settings"], // (none|list[str]): list of things to include EX: ["testing", "test2"] will include $root/testing and $root/test2 - includes have priority baised on order so last in list have highest priority, things not included have highest priority
