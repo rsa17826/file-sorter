@@ -22,7 +22,7 @@
         in
         {
           default = pkgs.writeShellApplication {
-            name = "browser-selector";
+            name = "file-sorter";
             runtimeInputs = [ python ];
             text = ''
               exec python3 "${./sorter.py}" "$@"
