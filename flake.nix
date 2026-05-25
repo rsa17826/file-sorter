@@ -26,6 +26,7 @@
             fileset = pkgs.lib.fileset.unions [
               ./sorter.py
               ./lib.py
+              ./defaults.jsonc
             ];
           };
         in
