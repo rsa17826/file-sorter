@@ -24,6 +24,7 @@
           src = pkgs.lib.fileset.toSource {
             root = ./.;
             fileset = pkgs.lib.fileset.unions [
+              ./icons
               ./sorter.py
               ./lib.py
               ./defaults.jsonc
