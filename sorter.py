@@ -30,7 +30,7 @@ from lib import print # noqa: E402
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 SCRIPT_DIR = _SCRIPT_DIR
-CONFIG_FILE = SCRIPT_DIR / "settings.jsonc"
+CONFIG_FILE = os.path.join(os.getenv(key="XDG_CONFIG_HOME", default=os.path.expanduser(path="~/.config")) ,"file-sorter", "settings.jsonc")
 ICONS_DIR = SCRIPT_DIR / "icons" # put your .png icons here
 FOLDER_ICON_NAME = ".foldericon.png"
 
@@ -43,7 +43,7 @@ _SPECIAL_KEYS = {"TRASH", "UNMOVED", "FOLDER", ""}
 
 def _load_config() -> dict:
   """Load settings.jsonc and resolve all #include directives."""
-  raw = f.read(str(CONFIG_FILE))
+  raw = f.read(CONFIG_FILE)
   config = libJson.parse(raw)
   config = libJson.parseincludes(config)
   f.write("a.json", text=libJson.str(config))
@@ -478,7 +478,9 @@ def sort_folder(base_path: Path, settings: dict) -> None:
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 
-if not CONFIG_FILE.exists():
+if not os.path.exists(CONFIG_FILE):
+  os.makedirs(os.path.join(os.getenv(key="XDG_CONFIG_HOME", default=os.path.expanduser(path="~/.config")) ,"file-sorter"))
+  _ = shutil.copy(SCRIPT_DIR / "defaults.jsonc", CONFIG_FILE)
   print.error(f"Config not found: {CONFIG_FILE}")
   sys.exit(1)
 
