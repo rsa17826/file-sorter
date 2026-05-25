@@ -479,7 +479,7 @@ def sort_folder(base_path: Path, settings: dict) -> None:
 
 
 if not os.path.exists(CONFIG_FILE):
-  os.makedirs(os.path.join(os.getenv(key="XDG_CONFIG_HOME", default=os.path.expanduser(path="~/.config")) ,"file-sorter"))
+  os.makedirs(os.path.join(os.getenv(key="XDG_CONFIG_HOME", default=os.path.expanduser(path="~/.config")) ,"file-sorter"), exist_ok=True)
   _ = shutil.copy(SCRIPT_DIR / "defaults.jsonc", CONFIG_FILE)
   print.error(f"Config not found: {CONFIG_FILE}")
   sys.exit(1)
