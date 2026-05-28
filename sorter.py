@@ -30,7 +30,11 @@ from lib import print # noqa: E402
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 SCRIPT_DIR = _SCRIPT_DIR
-CONFIG_FILE = os.path.join(os.getenv(key="XDG_CONFIG_HOME", default=os.path.expanduser(path="~/.config")) ,"file-sorter", "settings.jsonc")
+CONFIG_FILE = os.path.join(
+  os.getenv(key="XDG_CONFIG_HOME", default=os.path.expanduser(path="~/.config")),
+  "file-sorter",
+  "settings.jsonc",
+)
 ICONS_DIR = SCRIPT_DIR / "icons" # put your .png icons here
 FOLDER_ICON_NAME = ".foldericon.png"
 
@@ -283,7 +287,7 @@ def _secs_until_moveable(items: list[Path], min_secs: float) -> float:
 def _apply_folder_icons(base_path: Path, folder_icons: dict, icons_dir: Path) -> None:
   """
   For every entry in folder_icons, if the folder exists under base_path,
-  copy the matching PNG to <folder>/.foldericon.png.
+  create a symlink pointing to the matching PNG at <folder>/.foldericon.png.
   """
   for rel_folder, icon_name in folder_icons.items():
     folder_abs = base_path / rel_folder
@@ -301,8 +305,15 @@ def _apply_folder_icons(base_path: Path, folder_icons: dict, icons_dir: Path) ->
     for candidate in candidates:
       if candidate.exists() and candidate.suffix.lower() == ".png":
         dst = folder_abs / FOLDER_ICON_NAME
-        shutil.copy2(str(candidate), str(dst))
-        print.debug(f"Icon set: {rel_folder}  ←  {candidate.name}")
+
+        # ── Changed from shutil.copy2 to symlink ─────────────────────────────
+        if dst.exists() or dst.is_symlink():
+          dst.unlink() # Remove the existing file/symlink first
+
+        dst.symlink_to(candidate.resolve())
+        # ─────────────────────────────────────────────────────────────────────
+
+        print.debug(f"Icon linked: {rel_folder}  →  {candidate.name}")
         found = True
         break
     if not found:
@@ -426,7 +437,9 @@ def sort_folder(base_path: Path, settings: dict) -> None:
         # Guard: destination must not be inside the source directory itself
         try:
           dest.resolve().relative_to(item.resolve())
-          print.info(f"Skipping '{item.name}': destination '{dest}' is inside source — would move folder into itself")
+          print.info(
+            f"Skipping '{item.name}': destination '{dest}' is inside source — would move folder into itself"
+          )
           continue
         except ValueError:
           pass
@@ -479,7 +492,15 @@ def sort_folder(base_path: Path, settings: dict) -> None:
 
 
 if not os.path.exists(CONFIG_FILE):
-  os.makedirs(os.path.join(os.getenv(key="XDG_CONFIG_HOME", default=os.path.expanduser(path="~/.config")) ,"file-sorter"), exist_ok=True)
+  os.makedirs(
+    os.path.join(
+      os.getenv(
+        key="XDG_CONFIG_HOME", default=os.path.expanduser(path="~/.config")
+      ),
+      "file-sorter",
+    ),
+    exist_ok=True,
+  )
   _ = shutil.copy(SCRIPT_DIR / "defaults.jsonc", CONFIG_FILE)
   print.error(f"Config not found: {CONFIG_FILE}")
   sys.exit(1)
