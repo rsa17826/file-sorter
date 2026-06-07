@@ -19,6 +19,8 @@ import hashlib
 from pathlib import Path
 from typing import Optional
 
+import send2trash
+
 # ── Import from lib.py (must be in the same directory) ────────────────────────
 _SCRIPT_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, str(_SCRIPT_DIR))
@@ -112,7 +114,7 @@ def _safe_move(src: Path, dst_dir: Path, delete_if_same: bool) -> None:
   plain = dst_dir / src.name
   if plain.exists() and delete_if_same and plain.is_file() and src.is_file():
     if _files_identical(src, plain):
-      src.unlink()
+      send2trash.send2trash(src)
       print.warn(f"Deleted duplicate: {src.name}")
       return
 
