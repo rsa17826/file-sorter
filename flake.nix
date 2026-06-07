@@ -20,7 +20,12 @@
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          python = pkgs.python3.withPackages (ps: [ ps.commentjson ]);
+          python = pkgs.python3.withPackages (
+            ps: with ps; [
+              commentjson
+              send2trash
+            ]
+          );
           src = pkgs.lib.fileset.toSource {
             root = ./.;
             fileset = pkgs.lib.fileset.unions [
@@ -53,7 +58,12 @@
             packages = with pkgs; [
               xdg-utils
               basedpyright
-              (python3.withPackages (ps: with ps; [ commentjson ]))
+              (python3.withPackages (
+                ps: with ps; [
+                  commentjson
+                  send2trash
+                ]
+              ))
             ];
           };
         }

@@ -106,12 +106,29 @@ def _unique_dest(dst: Path) -> Path:
 def _safe_move(src: Path, dst_dir: Path, delete_if_same: bool) -> None:
   """Move *src* into *dst_dir*, handling duplicates and deletes."""
   dst_dir.mkdir(parents=True, exist_ok=True)
+
+  # Guard: if the file is already inside dst_dir, nothing to do
+  if src.parent.resolve() == dst_dir.resolve():
+    return
+
   dst = _unique_dest(dst_dir / src.name)
 
   # If the exact name already exists, check for identical content
   plain = dst_dir / src.name
-  if plain.exists() and delete_if_same and plain.is_file() and src.is_file():
+  if (
+    plain.resolve() != src.resolve()
+    and plain.exists()
+    and delete_if_same
+    and plain.is_file()
+    and src.is_file()
+  ):
     if _files_identical(src, plain):
+      print.debug(str(src), str(dst_dir / src.name))
+      print.debug(src.stat().st_size, plain.stat().st_size)
+      print.debug(
+        hashlib.md5(src.read_bytes()).hexdigest(),
+        hashlib.md5(plain.read_bytes()).hexdigest(),
+      )
       _move_to_trash(src)
       print.warn(f"Deleted duplicate: {src.name}")
       return
