@@ -50,7 +50,7 @@ def _load_config() -> dict:
   raw = f.read(CONFIG_FILE)
   config = libJson.parse(raw)
   config = libJson.parseincludes(config)
-  f.write("a.json", text=libJson.str(config))
+  # f.write("a.json", text=libJson.str(config))
   return config
 
 
